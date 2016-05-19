@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Compactacao dos arquivos de logs em /projetos e tomcat rotacionados, excluindo arquivos .gz
+find /projetos/*/logs -regex '.*\.log\..*[^Zz]$' -mtime +1 -exec gzip -9 {} \;
+find /usr/local/tomcat/logs -name '*.*.log' -mtime +1  -exec gzip -9 {} \;
+
+MAXIMO_DIAS=30
+MAXIMO_TAMANHO="1G"
+MAXIMO_TAMANHO_COMPACTADO="1G"
+
+# Exclusao dos arquivos .gz mais velhos do que data limite
+find /projetos/*/logs -name '*.gz' -mtime +$MAXIMO_DIAS -exec rm -f {} \;
+
+# Exclusao dos arquivos .gz maiores do que data limite
+find /projetos/*/logs -name '*.gz' -size +$MAXIMO_TAMANHO -exec rm -f {} \;
+
+# Exclusao dos arquivos .gz do tomcat (por data ou tamanho)
+find /usr/local/tomcat/logs -name '*.gz' -mtime +$MAXIMO_DIAS -exec rm -f {} \;
+find /usr/local/tomcat/logs -name '*.gz' -size +$MAXIMO_TAMANHO -exec rm -f {} \;
